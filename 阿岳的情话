@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阿岳的情话</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('https://alin-tech-maker.github.io/personality-thought.github.io/%E7%B2%89%E8%89%B2%E6%9D%9C%E5%AE%BE%E5%B8%BD%E5%B0%8F%E7%8B%971.png') no-repeat center center;
+            background-size: cover;
+            font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+        
+        .effects-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .hearts-container {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .heart {
+            position: absolute;
+            color: rgba(255, 182, 193, 0.7);
+            animation: float 4s ease-in-out infinite;
+            pointer-events: none;
+            user-select: none;
+        }
+        
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .light {
+            position: absolute;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        
+        .flower {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            animation: float-down 10s linear forwards;
+        }
+        
+        .meteor {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
+            animation: meteor-fall 3s linear forwards;
+            transform: rotate(45deg);
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-20px) scale(1.2);
+                opacity: 0.9;
+            }
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.5); opacity: 0.8; }
+        }
+        
+        @keyframes float-down {
+            to { transform: translateY(100vh); }
+        }
+        
+        @keyframes meteor-fall {
+            from { transform: translateX(-100px) translateY(-100px) rotate(45deg); opacity: 1; }
+            to { transform: translateX(100vw) translateY(100vh) rotate(45deg); opacity: 0; }
+        }
+        
+        .dialog-box {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.85);
+            border-radius: 20px;
+            padding: 30px 40px;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255, 182, 193, 0.5);
+            z-index: 100;
+        }
+        
+        .dialog-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .message {
+            font-size: 24px;
+            color: #ff6b8b;
+            font-weight: bold;
+            margin: 0;
+            transition: opacity 0.5s ease;
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .hidden {
+            opacity: 0;
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            right: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="effects-container" id="effects"></div>
+    <div class="hearts-container" id="hearts"></div>
+    
+    <div class="dialog-box" id="dialog">
+        <p class="message" id="message1">你知道我喜欢什么样的女孩吗？</p>
+        <p class="message hidden" id="message2">❤️参考屏幕前的你❤️</p>
+    </div>
+
+    <script>
+        // 消息数组
+        const messages = [
+            "❤️参考屏幕前的你❤️",
+            "这张照片专门给你拍的",
+            "粉色小狗是不是很可爱？",
+            "穿着这一身和你去爱丁堡散步怎么样？",
+            "别忘了去看看这个美丽的世界，也让美丽的世界看看美丽的你",
+            "大雨落下，阳光依旧",
+            "我们终会在世界的某一个角落相遇",
+            "找到自己",
+            "PINKRAY生来就不为点缀"
+        ];
+        
+        // 特效类型
+        const effects = [
+            'stars',
+            'lights',
+            'flowers',
+            'meteors',
+            'hearts'
+        ];
+        
+        // 创建爱心元素
+        function createHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const heartCount = 50; // 增加爱心数量
+            
+            for (let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '❤';
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.top = `${Math.random() * 100}%`;
+                heart.style.fontSize = `${Math.random() * 20 + 10}px`;
+                heart.style.animationDelay = `${Math.random() * 4}s`;
+                heart.style.opacity = `${Math.random() * 0.5 + 0.3}`;
+                heartsContainer.appendChild(heart);
+            }
+        }
+        
+        // 创建星星特效
+        function createStars() {
+            const container = document.getElementById('effects');
+            const count = 100;
+            
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.width = `${Math.random() * 3 + 1}px`;
+                star.style.height = star.style.width;
+                star.style.animationDelay = `${Math.random() * 2}s`;
+                container.appendChild(star);
+            }
+        }
+        
+        // 创建光点特效
+        function createLights() {
+            const container = document.getElementById('effects');
+            const count = 20;
+            
+            for (let i = 0; i < count; i++) {
+                const light = document.createElement('div');
+                light.className = 'light';
+                light.style.left = `${Math.random() * 100}%`;
+                light.style.top = `${Math.random() * 100}%`;
+                light.style.width = `${Math.random() * 100 + 50}px`;
+                light.style.height = light.style.width;
+                light.style.animationDelay = `${Math.random() * 3}s`;
+                container.appendChild(light);
+            }
+        }
+        
+        // 创建花海特效
+        function createFlowers() {
+            const container = document.getElementById('effects');
+            const count = 30;
+            const flowers = ['🌸', '🌺', '🌷', '🌹', '💐', '🌼', '🌻'];
+            
+            for (let i = 0; i < count; i++) {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.innerHTML = flowers[Math.floor(Math.random() * flowers.length)];
+                flower.style.left = `${Math.random() * 100}%`;
+                flower.style.top = `${Math.random() * 100 - 10}%`;
+                flower.style.fontSize = `${Math.random() * 20 + 15}px`;
+                flower.style.animationDelay = `${Math.random() * 5}s`;
+                container.appendChild(flower);
+            }
+        }
+        
+        // 创建流星特效
+        function createMeteors() {
+            const container = document.getElementById('effects');
+            const count = 5;
+            
+            for (let i = 0; i < count; i++) {
+                const meteor = document.createElement('div');
+                meteor.className = 'meteor';
+                meteor.style.left = `${Math.random() * 20}%`;
+                meteor.style.top = `${Math.random() * 20}%`;
+                meteor.style.width = `${Math.random() * 200 + 100}px`;
+                meteor.style.animationDelay = `${Math.random() * 3}s`;
+                container.appendChild(meteor);
+            }
+        }
+        
+        // 清除所有特效
+        function clearEffects() {
+            document.getElementById('effects').innerHTML = '';
+        }
+        
+        // 随机选择特效
+        function randomEffect() {
+            clearEffects();
+            const effect = effects[Math.floor(Math.random() * effects.length)];
+            
+            switch(effect) {
+                case 'stars':
+                    createStars();
+                    break;
+                case 'lights':
+                    createLights();
+                    break;
+                case 'flowers':
+                    createFlowers();
+                    break;
+                case 'meteors':
+                    createMeteors();
+                    break;
+                case 'hearts':
+                    addMoreHearts();
+                    break;
+            }
+        }
+        
+        // 对话框点击事件
+        function setupDialog() {
+            const dialog = document.getElementById('dialog');
+            const message1 = document.getElementById('message1');
+            const message2 = document.getElementById('message2');
+            let currentMessage = message1;
+            let nextMessage = message2;
+            let firstClick = true;
+            
+            dialog.addEventListener('click', function() {
+                if (firstClick) {
+                    // 第一次点击
+                    firstClick = false;
+                    currentMessage.classList.add('hidden');
+                    setTimeout(() => {
+                        nextMessage.textContent = messages[0];
+                        nextMessage.classList.remove('hidden');
+                        currentMessage = nextMessage;
+                        nextMessage = document.createElement('p');
+                        nextMessage.className = 'message hidden';
+                        dialog.appendChild(nextMessage);
+                        randomEffect();
+                    }, 500);
+                } else {
+                    // 后续点击
+                    currentMessage.classList.add('hidden');
+                    setTimeout(() => {
+                        const randomIndex = Math.floor(Math.random() * (messages.length - 1)) + 1;
+                        nextMessage.textContent = messages[randomIndex];
+                        nextMessage.classList.remove('hidden');
+                        const temp = currentMessage;
+                        currentMessage = nextMessage;
+                        nextMessage = temp;
+                        randomEffect();
+                    }, 500);
+                }
+            });
+        }
+        
+        // 点击后添加更多爱心
+        function addMoreHearts() {
+            const heartsContainer = document.getElementById('hearts');
+            const additionalHearts = 30;
+            
+            for (let i = 0; i < additionalHearts; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = '❤';
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.top = `${Math.random() * 100 + 100}%`;
+                heart.style.fontSize = `${Math.random() * 25 + 15}px`;
+                heart.style.animation = `float 3s ease-in-out ${Math.random() * 2}s forwards`;
+                heart.style.opacity = '0.8';
+                heartsContainer.appendChild(heart);
+            }
+        }
+        
+        // 初始化
+        window.onload = function() {
+            createHearts();
+            setupDialog();
+        };
+    </script>
+</body>
+</html>
